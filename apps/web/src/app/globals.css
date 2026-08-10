@@ -183,15 +183,26 @@ body {
 }
 
 .list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.85rem 1.1rem;
+  display: block;
+  padding: 0;
   border-bottom: 1px solid var(--line);
 }
 
 .list li:last-child {
   border-bottom: 0;
+}
+
+.row-link {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.row-link:hover {
+  background: #eef5f0;
 }
 
 .list li div {
@@ -208,6 +219,7 @@ body {
   color: var(--muted);
   font-style: normal;
   white-space: nowrap;
+  align-self: center;
 }
 
 .tag {
@@ -232,12 +244,97 @@ body {
 
 .empty {
   color: var(--muted);
+  padding: 0.85rem 1.1rem;
+}
+
+.empty-pad {
+  color: var(--muted);
+  padding: 1rem 1.1rem;
+}
+
+.hint {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.back {
+  color: var(--accent);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.9rem;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 1rem 0 1.2rem;
+}
+
+.graph-wrap {
+  padding: 0.5rem 0.5rem 1rem;
+}
+
+.graph-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background:
+    radial-gradient(circle at 50% 45%, #eef5f1 0%, transparent 55%),
+    #fbfcfb;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.2rem;
+  padding: 0.4rem 1rem 0.2rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.graph-legend .dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+}
+
+.graph-legend .dot.company { background: #1f5c45; }
+.graph-legend .dot.person { background: #1d4f78; }
+.graph-legend .dot.concept { background: #7a4e12; }
+.graph-legend .dot.payment { background: #8b1e1e; }
+
+.chips {
+  list-style: none;
+  margin: 0;
+  padding: 0.9rem 1.1rem 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chips li {
+  border: 1px solid var(--line);
+  background: #f3f7f4;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.85rem;
 }
 
 .foot {
   margin-top: 1.4rem;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.banner a {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 @media (max-width: 800px) {
@@ -247,5 +344,13 @@ body {
 
   .search .row {
     flex-direction: column;
+  }
+
+  .row-link {
+    flex-direction: column;
+  }
+
+  .list li em {
+    align-self: flex-start;
   }
 }
