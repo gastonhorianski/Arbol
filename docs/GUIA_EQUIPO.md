@@ -1,130 +1,137 @@
-# Árbol — Guía de trabajo del equipo
+# Árbol — Guía corta del equipo
 
-**Documento Día 0.** Léelo una vez. Después, solo “hacer y subir”.
-
----
-
-## 1. Qué estamos construyendo
-
-Un **mapa de relaciones** (knowledge graph) entre:
-
-- Políticos y funcionarios  
-- Familiares  
-- Empresas (propiedad / directorio / participación)  
-- Subsidios del Estado a esas empresas  
-
-Objetivo: ver **cómo fluye el dinero público** a través de vínculos familiares y corporativos.
+Leé esto una vez. Después trabajamos cada uno a su ritmo.
 
 ---
 
-## 2. Regla de oro
+## De qué se trata este proyecto
 
-> **La IA es personal. El proyecto es compartido.**
+Queremos armar un **mapa de conexiones** del sistema político y económico.
 
-Podés usar **Claude, Cursor, ChatGPT o lo que sea**.  
-No hace falta que todos usemos la misma herramienta.
+La idea es poder ver, en una sola red:
 
-Lo que sí compartimos:
+1. **Personas** — políticos, funcionarios y sus familiares  
+2. **Empresas / proveedores** — quién es dueño, director, socio o cobró al Estado  
+3. **Pagos y subsidios** — plata pública que llegó a esas empresas o personas  
 
-| Pieza | Para qué sirve |
+Así se puede seguir el hilo: *persona → familia → empresa → plata pública*.
+
+No es solo una planilla. Es un **mapa de relaciones** para investigar y explicar cómo se conectan esos puntos.
+
+---
+
+## Primera fuente de datos (para empezar)
+
+**Título:** Balance 2025 de Municipalidad de Posadas
+
+Ya tenemos un trabajo previo con fotos del balance municipal 2025 (sacadas con celular) y texto leído por OCR.
+
+**Qué sí podemos usar con confianza:**
+- Nombres de **proveedores / empresas**
+- Nombres de **personas** que aparecen en esos registros
+
+**Qué hay que verificar antes de darlo por cerrado:**
+- Los **montos** (plata). La lectura automática desde fotos de celular tiene errores.  
+  Regla: si un monto importa para publicar o afirmar algo, **se contrasta con la foto original**.
+
+En resumen: esta fuente nos sirve mucho para armar la red de quién aparece; los importes van con bandera de “revisar contra foto”.
+
+---
+
+## Cómo trabajamos entre nosotros
+
+Somos pocos, casi no tenemos reuniones, y cada uno usa su tiempo libre.
+
+Por eso la regla es simple:
+
+> **Cada uno usa la IA que le resulte cómoda. El trabajo se junta en los mismos lugares.**
+
+Podés usar Claude, Cursor, ChatGPT u otra. No importa cuál.
+
+Lo que sí compartimos son estos 3 lugares:
+
+| Nombre | Qué es, en criollo |
 | --- | --- |
-| **GitHub** | El código de todos |
-| **Vercel** | Link automático para ver el avance (sin instalar nada) |
-| **Supabase** | La base de datos central (proyecto **nuevo**, no el de VASTO) |
+| **GitHub** | La carpeta compartida del código |
+| **Vercel** | El link para **ver** el avance en internet, sin instalar nada |
+| **Supabase** | La base de datos compartida (donde viven personas, empresas, vínculos y pagos) |
 
 ---
 
-## 3. Cómo trabajamos (paso a paso)
+## Links del proyecto
 
-1. Trabajás en **tu parte** (ver sección 5).  
-2. Pedile a tu IA que genere código **solo en tu carpeta**.  
-3. Subís a GitHub en una **rama** (no directo a `main`).  
-4. Abrís un **Pull Request**.  
-5. Vercel genera un **link preview** → ese link se lo mandás al resto.  
-6. Si está bien, se mezcla a `main` y queda en producción.
+- **Ver la web ahora:** https://arbol-eight.vercel.app  
+- **Código en GitHub:** https://github.com/gastonhorianski/Arbol  
+- **Base de datos (Supabase):** https://supabase.com/dashboard/project/yevtcxmusooynydsygng  
 
-**Sin reuniones.** El preview es la reunión.
+Si querés ver “cómo va quedando”, abrí el link de Vercel. Ese es nuestro tablero.
 
 ---
 
-## 4. Identidad de datos (contrato de oro)
+## Cómo es un día de trabajo típico
 
-- Personas: anclar con **DNI** (si existe).  
-- Empresas: anclar con **CUIT** (si existe).  
-- El **nombre** es solo una etiqueta (puede haber varios alias).  
-- En la base, la clave interna es un **UUID**; DNI/CUIT son únicos cuando existen.  
-- **Nunca** inventar DNI/CUIT. Si no está, dejar vacío y marcar la fuente.
+1. Abrís el proyecto (o pedile a tu IA que trabaje sobre el repo).  
+2. Tocás **solo tu parte** (abajo te decimos cuál).  
+3. Subís el cambio a GitHub en una **rama** (una copia de trabajo, no la versión principal).  
+4. Pedís incorporar el cambio (**Pull Request**).  
+5. Vercel te da un **link preview**. Ese link se lo mandás al resto.  
+6. Si está bien, se mezcla a la versión principal y queda visible para todos.
 
-Cada hecho debería poder responder: ¿de dónde salió? (`source_url`, fecha, confianza).
+Sin reunión: **el link preview es la reunión**.
 
 ---
 
-## 5. Quién toca qué (para no pisarnos)
+## Regla más importante de los datos
 
-| Rol | Dueño de | No tocar sin avisar |
+Los nombres se escriben de mil formas distintas (“Martín Pérez”, “M. Pérez”, etc.).  
+Para no duplicar gente ni empresas:
+
+- **Persona** → se identifica por **DNI** (si lo tenemos)  
+- **Empresa** → se identifica por **CUIT** (si lo tenemos)  
+- El **nombre** es solo la etiqueta que se muestra  
+
+Si no hay DNI o CUIT, **no inventarlo**. Se deja vacío y se anota de dónde salió el dato (fuente, foto, fecha).
+
+Para el Balance 2025 Posadas: anotar siempre la fuente y, si hay monto, marcar si ya fue **verificado contra foto** o no.
+
+---
+
+## Para no pisarnos el trabajo
+
+Cada uno tiene una zona:
+
+| Quién | De qué se ocupa | Mejor no tocar |
 | --- | --- | --- |
-| Persona A | UI del mapa / fichas (`apps/web`) | Migraciones de base |
-| Persona B | Schema / migraciones (`packages/db`) | Componentes visuales del grafo |
-| Persona C | Carga de datos / ETL (`scripts/ingest`) | UI |
+| Persona A | Pantalla del mapa y fichas | La estructura de la base |
+| Persona B | Estructura de la base de datos | El diseño visual del mapa |
+| Persona C | Cargar / limpiar datos de fuentes | La pantalla |
 
-**Carpetas sagradas (hablar antes de cambiar):**
-
-- `packages/domain` — tipos y reglas compartidas  
-- `packages/db/migrations` — estructura de la base  
+Si tu IA quiere cambiar algo fuera de tu zona, paramos y avisamos por mensaje.
 
 ---
 
-## 6. Nombres de ramas
+## Qué pedirle a tu IA (frase útil)
 
-```text
-feat/<inicial>/<tema>
-```
+Podés copiar esto cuando empieces:
 
-Ejemplos:
-
-- `feat/o/graph-ui`  
-- `feat/p/ingest-subsidios`  
-- `feat/m/schema-persons`  
-
-Una PR = un tema. Si tocás base + UI, mejor dos PRs.
+> Estamos en el proyecto Árbol (GitHub: gastonhorianski/Arbol).  
+> Es un mapa de políticos, familiares, empresas y plata pública.  
+> Primera fuente: Balance 2025 de Municipalidad de Posadas.  
+> Proveedores y personas: útiles. Montos: verificar contra fotos (OCR con errores).  
+> Personas por DNI, empresas por CUIT. No inventar documentos.  
+> Trabajá solo en mi carpeta / mi parte.
 
 ---
 
-## 7. Qué NO hacemos (por ahora)
+## Primer paso para vos
 
-- No mezclar datos con el proyecto Supabase de **VASTO / panadería**.  
-- No crear tablas “a mano” solo en el panel de Supabase: van por **migración en el repo**.  
-- No usar Neo4j ni otra base de grafos en Fase 1 (Postgres alcanza).  
-- No pelear por Claude vs Cursor.
+1. Leé esta guía.  
+2. Abrí el link de Vercel y mirá lo que hay hoy.  
+3. Pedí acceso al repo de GitHub si todavía no lo tenés.  
+4. Decime qué parte querés tomar (pantalla, base o datos).  
 
----
-
-## 8. Analogía rápida
-
-| En la vida real | En el proyecto |
-| --- | --- |
-| Tu Word / Google Docs | Tu IA (Claude, Cursor…) |
-| Carpeta compartida del Drive | GitHub |
-| Link público del documento | Vercel preview |
-| Planilla central | Supabase (proyecto Árbol) |
+Con eso ya podemos avanzar.
 
 ---
 
-## 9. Links
-
-- Repo GitHub: https://github.com/gastonhorianski/Arbol  
-- Preview / producción Vercel: https://arbol-eight.vercel.app  
-- Supabase `arbol-kg-staging`: https://supabase.com/dashboard/project/yevtcxmusooynydsygng  
-- API URL: `https://yevtcxmusooynydsygng.supabase.co`  
-
----
-
-## 10. Mensaje corto para WhatsApp / mail
-
-> Cada uno usa la IA que quiera (yo Cursor, ustedes Claude si prefieren).  
-> Código → GitHub. Ver avance → link de Vercel. Datos → Supabase nuevo (no VASTO).  
-> Personas por DNI, empresas por CUIT. Cada uno en su carpeta. Sin reuniones.
-
----
-
-*Versión Día 0 — Árbol Knowledge Graph*
+*Árbol — guía del equipo*

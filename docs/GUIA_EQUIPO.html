@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Árbol — Guía de trabajo del equipo</title>
+  <title>Árbol — Guía corta del equipo</title>
   <style>
     @page { margin: 1.6cm; size: A4; }
     :root {
@@ -11,13 +11,15 @@
       --line: #d5ddd7;
       --accent: #1f5c45;
       --bg: #f7f6f2;
+      --warn: #7a4e12;
+      --warnbg: #f7f0e4;
     }
     * { box-sizing: border-box; }
     body {
       font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       color: var(--ink);
       background: white;
-      line-height: 1.45;
+      line-height: 1.5;
       font-size: 11pt;
       max-width: 720px;
       margin: 0 auto;
@@ -25,11 +27,11 @@
     }
     h1 {
       font-size: 22pt;
-      margin: 0 0 4px;
+      margin: 0 0 6px;
       color: var(--accent);
       letter-spacing: -0.02em;
     }
-    .subtitle { color: var(--muted); margin-bottom: 20px; }
+    .subtitle { color: var(--muted); margin: 0 0 22px; }
     h2 {
       font-size: 13pt;
       margin: 22px 0 8px;
@@ -38,7 +40,7 @@
       color: var(--accent);
     }
     p, li { margin: 6px 0; }
-    ul { padding-left: 1.2em; }
+    ol, ul { padding-left: 1.25em; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -47,7 +49,7 @@
     }
     th, td {
       border: 1px solid var(--line);
-      padding: 7px 9px;
+      padding: 8px 9px;
       text-align: left;
       vertical-align: top;
     }
@@ -57,17 +59,6 @@
       padding: 10px 14px;
       background: var(--bg);
       border-left: 4px solid var(--accent);
-      color: var(--ink);
-    }
-    code, pre {
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 10pt;
-    }
-    pre {
-      background: var(--bg);
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      white-space: pre-wrap;
     }
     .box {
       border: 1px solid var(--line);
@@ -75,6 +66,15 @@
       margin: 12px 0;
       background: #fff;
     }
+    .warn {
+      border: 1px solid #e2d0ad;
+      background: var(--warnbg);
+      padding: 12px 14px;
+      margin: 12px 0;
+      color: var(--ink);
+    }
+    .warn strong { color: var(--warn); }
+    a { color: var(--accent); }
     .footer {
       margin-top: 28px;
       padding-top: 10px;
@@ -90,104 +90,96 @@
 </head>
 <body>
   <h1>Árbol</h1>
-  <p class="subtitle"><strong>Guía de trabajo del equipo</strong> — Documento Día 0. Léelo una vez. Después, solo “hacer y subir”.</p>
+  <p class="subtitle">Guía corta del equipo. Leé esto una vez. Después trabajamos cada uno a su ritmo.</p>
 
-  <h2>1. Qué estamos construyendo</h2>
-  <p>Un <strong>mapa de relaciones</strong> (knowledge graph) entre:</p>
-  <ul>
-    <li>Políticos y funcionarios</li>
-    <li>Familiares</li>
-    <li>Empresas (propiedad / directorio / participación)</li>
-    <li>Subsidios del Estado a esas empresas</li>
-  </ul>
-  <p>Objetivo: ver <strong>cómo fluye el dinero público</strong> a través de vínculos familiares y corporativos.</p>
-
-  <h2>2. Regla de oro</h2>
-  <blockquote>La IA es personal. El proyecto es compartido.</blockquote>
-  <p>Podés usar <strong>Claude, Cursor, ChatGPT o lo que sea</strong>. No hace falta la misma herramienta.</p>
-  <table>
-    <thead><tr><th>Pieza</th><th>Para qué sirve</th></tr></thead>
-    <tbody>
-      <tr><td><strong>GitHub</strong></td><td>El código de todos</td></tr>
-      <tr><td><strong>Vercel</strong></td><td>Link automático para ver el avance (sin instalar nada)</td></tr>
-      <tr><td><strong>Supabase</strong></td><td>La base de datos central (proyecto <strong>nuevo</strong>, no el de VASTO)</td></tr>
-    </tbody>
-  </table>
-
-  <h2>3. Cómo trabajamos</h2>
+  <h2>De qué se trata este proyecto</h2>
+  <p>Queremos armar un <strong>mapa de conexiones</strong> del sistema político y económico.</p>
+  <p>La idea es poder ver, en una sola red:</p>
   <ol>
-    <li>Trabajás en <strong>tu parte</strong> (sección 5).</li>
-    <li>Pedile a tu IA código <strong>solo en tu carpeta</strong>.</li>
-    <li>Subís a GitHub en una <strong>rama</strong> (no directo a <code>main</code>).</li>
-    <li>Abrís un <strong>Pull Request</strong>.</li>
-    <li>Vercel genera un <strong>link preview</strong> → ese link se lo mandás al resto.</li>
-    <li>Si está bien, se mezcla a <code>main</code>.</li>
+    <li><strong>Personas</strong> — políticos, funcionarios y sus familiares</li>
+    <li><strong>Empresas / proveedores</strong> — quién es dueño, director, socio o cobró al Estado</li>
+    <li><strong>Pagos y subsidios</strong> — plata pública que llegó a esas empresas o personas</li>
   </ol>
-  <p><strong>Sin reuniones.</strong> El preview es la reunión.</p>
+  <p>Así se puede seguir el hilo: <em>persona → familia → empresa → plata pública</em>.</p>
+  <p>No es solo una planilla. Es un <strong>mapa de relaciones</strong> para investigar y explicar cómo se conectan esos puntos.</p>
 
-  <h2>4. Identidad de datos (contrato de oro)</h2>
-  <ul>
-    <li>Personas → anclar con <strong>DNI</strong> (si existe).</li>
-    <li>Empresas → anclar con <strong>CUIT</strong> (si existe).</li>
-    <li>El nombre es solo etiqueta (puede haber alias).</li>
-    <li>Clave interna = <strong>UUID</strong>; DNI/CUIT únicos cuando existen.</li>
-    <li><strong>Nunca inventar</strong> DNI/CUIT. Si no está, dejar vacío y marcar la fuente.</li>
-  </ul>
+  <h2>Primera fuente de datos (para empezar)</h2>
+  <p><strong>Título:</strong> Balance 2025 de Municipalidad de Posadas</p>
+  <p>Ya tenemos un trabajo previo con fotos del balance municipal 2025 (sacadas con celular) y texto leído por OCR.</p>
+  <div class="warn">
+    <p><strong>Qué sí usar con confianza:</strong> nombres de proveedores/empresas y de personas.</p>
+    <p><strong>Qué verificar:</strong> los montos. La lectura automática desde fotos de celular tiene errores. Si un monto importa, se contrasta con la foto original.</p>
+  </div>
+  <p>Esta fuente sirve mucho para armar la red de quién aparece; los importes van con bandera de “revisar contra foto”.</p>
 
-  <h2>5. Quién toca qué</h2>
+  <h2>Cómo trabajamos entre nosotros</h2>
+  <p>Somos pocos, casi no tenemos reuniones, y cada uno usa su tiempo libre.</p>
+  <blockquote>Cada uno usa la IA que le resulte cómoda. El trabajo se junta en los mismos lugares.</blockquote>
+  <p>Podés usar Claude, Cursor, ChatGPT u otra. No importa cuál.</p>
   <table>
-    <thead><tr><th>Rol</th><th>Dueño de</th><th>No tocar sin avisar</th></tr></thead>
+    <thead><tr><th>Nombre</th><th>Qué es, en criollo</th></tr></thead>
     <tbody>
-      <tr><td>Persona A</td><td>UI del mapa / fichas (<code>apps/web</code>)</td><td>Migraciones de base</td></tr>
-      <tr><td>Persona B</td><td>Schema / migraciones (<code>packages/db</code>)</td><td>Componentes visuales del grafo</td></tr>
-      <tr><td>Persona C</td><td>Carga de datos / ETL (<code>scripts/ingest</code>)</td><td>UI</td></tr>
-    </tbody>
-  </table>
-  <p><strong>Carpetas sagradas</strong> (hablar antes): <code>packages/domain</code> y <code>packages/db/migrations</code>.</p>
-
-  <h2>6. Nombres de ramas</h2>
-  <pre>feat/&lt;inicial&gt;/&lt;tema&gt;
-
-Ejemplos:
-feat/o/graph-ui
-feat/p/ingest-subsidios
-feat/m/schema-persons</pre>
-  <p>Una PR = un tema.</p>
-
-  <h2>7. Qué NO hacemos (por ahora)</h2>
-  <ul>
-    <li>No mezclar datos con el Supabase de <strong>VASTO / panadería</strong>.</li>
-    <li>No crear tablas solo en el panel: van por <strong>migración en el repo</strong>.</li>
-    <li>No Neo4j en Fase 1 (Postgres alcanza).</li>
-    <li>No pelear por Claude vs Cursor.</li>
-  </ul>
-
-  <h2>8. Analogía rápida</h2>
-  <table>
-    <thead><tr><th>En la vida real</th><th>En el proyecto</th></tr></thead>
-    <tbody>
-      <tr><td>Tu Word / Google Docs</td><td>Tu IA (Claude, Cursor…)</td></tr>
-      <tr><td>Carpeta compartida del Drive</td><td>GitHub</td></tr>
-      <tr><td>Link público del documento</td><td>Vercel preview</td></tr>
-      <tr><td>Planilla central</td><td>Supabase (proyecto Árbol)</td></tr>
+      <tr><td><strong>GitHub</strong></td><td>La carpeta compartida del código</td></tr>
+      <tr><td><strong>Vercel</strong></td><td>El link para <strong>ver</strong> el avance en internet, sin instalar nada</td></tr>
+      <tr><td><strong>Supabase</strong></td><td>La base de datos compartida</td></tr>
     </tbody>
   </table>
 
-  <h2>9. Links del proyecto</h2>
+  <h2>Links del proyecto</h2>
   <div class="box">
-    <p>Repo GitHub: <a href="https://github.com/gastonhorianski/Arbol">https://github.com/gastonhorianski/Arbol</a></p>
-    <p>Vercel: <a href="https://arbol-eight.vercel.app">https://arbol-eight.vercel.app</a></p>
-    <p>Supabase <code>arbol-kg-staging</code>: <a href="https://supabase.com/dashboard/project/yevtcxmusooynydsygng">https://supabase.com/dashboard/project/yevtcxmusooynydsygng</a></p>
-    <p>API URL: <code>https://yevtcxmusooynydsygng.supabase.co</code></p>
+    <p><strong>Ver la web ahora:</strong> <a href="https://arbol-eight.vercel.app">https://arbol-eight.vercel.app</a></p>
+    <p><strong>Código en GitHub:</strong> <a href="https://github.com/gastonhorianski/Arbol">https://github.com/gastonhorianski/Arbol</a></p>
+    <p><strong>Base de datos:</strong> <a href="https://supabase.com/dashboard/project/yevtcxmusooynydsygng">https://supabase.com/dashboard/project/yevtcxmusooynydsygng</a></p>
   </div>
 
-  <h2>10. Mensaje corto (WhatsApp / mail)</h2>
+  <h2>Cómo es un día de trabajo típico</h2>
+  <ol>
+    <li>Abrís el proyecto (o pedile a tu IA que trabaje sobre el repo).</li>
+    <li>Tocás <strong>solo tu parte</strong>.</li>
+    <li>Subís el cambio a GitHub en una <strong>rama</strong>.</li>
+    <li>Pedís incorporar el cambio (<strong>Pull Request</strong>).</li>
+    <li>Vercel te da un <strong>link preview</strong> → se lo mandás al resto.</li>
+    <li>Si está bien, se mezcla a la versión principal.</li>
+  </ol>
+  <p>Sin reunión: <strong>el link preview es la reunión</strong>.</p>
+
+  <h2>Regla más importante de los datos</h2>
+  <ul>
+    <li><strong>Persona</strong> → <strong>DNI</strong> (si lo tenemos)</li>
+    <li><strong>Empresa</strong> → <strong>CUIT</strong> (si lo tenemos)</li>
+    <li>El <strong>nombre</strong> es solo la etiqueta</li>
+  </ul>
+  <p>Si no hay DNI o CUIT, <strong>no inventarlo</strong>. Anotar de dónde salió el dato.</p>
+  <p>Para el Balance 2025 Posadas: si hay monto, marcar si ya fue <strong>verificado contra foto</strong> o no.</p>
+
+  <h2>Para no pisarnos el trabajo</h2>
+  <table>
+    <thead><tr><th>Quién</th><th>De qué se ocupa</th><th>Mejor no tocar</th></tr></thead>
+    <tbody>
+      <tr><td>Persona A</td><td>Pantalla del mapa y fichas</td><td>La estructura de la base</td></tr>
+      <tr><td>Persona B</td><td>Estructura de la base de datos</td><td>El diseño visual del mapa</td></tr>
+      <tr><td>Persona C</td><td>Cargar / limpiar datos de fuentes</td><td>La pantalla</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Qué pedirle a tu IA (frase útil)</h2>
   <div class="box">
-    Cada uno usa la IA que quiera (yo Cursor, ustedes Claude si prefieren).<br/>
-    Código → GitHub. Ver avance → link de Vercel. Datos → Supabase nuevo (no VASTO).<br/>
-    Personas por DNI, empresas por CUIT. Cada uno en su carpeta. Sin reuniones.
+    Estamos en el proyecto Árbol (GitHub: gastonhorianski/Arbol).<br/>
+    Es un mapa de políticos, familiares, empresas y plata pública.<br/>
+    Primera fuente: Balance 2025 de Municipalidad de Posadas.<br/>
+    Proveedores y personas: útiles. Montos: verificar contra fotos (OCR con errores).<br/>
+    Personas por DNI, empresas por CUIT. No inventar documentos.<br/>
+    Trabajá solo en mi carpeta / mi parte.
   </div>
 
-  <p class="footer">Versión Día 0 — Árbol Knowledge Graph · Imprimir / Guardar como PDF desde el navegador (Ctrl+P)</p>
+  <h2>Primer paso para vos</h2>
+  <ol>
+    <li>Leé esta guía.</li>
+    <li>Abrí el link de Vercel y mirá lo que hay hoy.</li>
+    <li>Pedí acceso al repo de GitHub si todavía no lo tenés.</li>
+    <li>Decime qué parte querés tomar (pantalla, base o datos).</li>
+  </ol>
+
+  <p class="footer">Árbol — guía del equipo</p>
 </body>
 </html>

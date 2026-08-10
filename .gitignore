@@ -30,3 +30,6 @@ yarn-error.log*
 
 # PDF tool cache
 .puppeteer*
+scripts/ingest/chunks/
+scripts/ingest/balance_2025_posadas.sql
+apps/web/.env*.local

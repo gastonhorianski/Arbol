@@ -6,7 +6,13 @@ Mapa de relaciones entre políticos, familiares, empresas y subsidios.
 
 - **GitHub** — código
 - **Vercel** — deploy + preview por PR
-- **Supabase** — Postgres (`arbol-kg-staging`, org VASTO; proyecto **nuevo**, no la DB de panadería)
+- **Supabase** — base de datos Postgres del proyecto (`arbol-kg-staging`)
+
+## Links vivos
+
+- GitHub: https://github.com/gastonhorianski/Arbol
+- Vercel: https://arbol-eight.vercel.app
+- Supabase staging: https://supabase.com/dashboard/project/yevtcxmusooynydsygng
 
 ## Arranque local
 

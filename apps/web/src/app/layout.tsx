@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Árbol",
-  description: "Mapa de relaciones político-económicas",
+  title: "Balance 2025 de Municipalidad de Posadas · Árbol",
+  description:
+    "Avance del mapa Árbol con proveedores y personas del Balance 2025 de Posadas",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
