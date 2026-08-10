@@ -278,12 +278,24 @@ body {
   padding: 0.5rem 0.5rem 1rem;
 }
 
+.graph-help {
+  margin: 0.6rem 1rem 0.4rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.graph-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .graph-svg {
   width: 100%;
+  min-width: 720px;
   height: auto;
   display: block;
   background:
-    radial-gradient(circle at 50% 45%, #eef5f1 0%, transparent 55%),
+    radial-gradient(circle at 50% 20%, #eef5f1 0%, transparent 50%),
     #fbfcfb;
 }
 
@@ -308,6 +320,66 @@ body {
 .graph-legend .dot.person { background: #1d4f78; }
 .graph-legend .dot.concept { background: #7a4e12; }
 .graph-legend .dot.payment { background: #8b1e1e; }
+
+.conn-list {
+  border-top: 1px solid var(--line);
+  margin-top: 0.6rem;
+  padding: 0.8rem 1rem 0.4rem;
+}
+
+.conn-list h3 {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+}
+
+.conn-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.conn-list li {
+  border-bottom: 1px solid var(--line);
+}
+
+.conn-list li:last-child {
+  border-bottom: 0;
+}
+
+.conn-btn {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.2rem 0.7rem;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.7rem 0.2rem;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.conn-btn:hover {
+  background: #eef5f0;
+}
+
+.conn-btn .tag {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.conn-btn strong {
+  font-size: 0.95rem;
+}
+
+.conn-btn em {
+  grid-column: 2;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.85rem;
+}
 
 .chips {
   list-style: none;

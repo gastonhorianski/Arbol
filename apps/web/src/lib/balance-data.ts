@@ -17,6 +17,7 @@ export type GraphNode = {
   label: string;
   kind: "person" | "company" | "concept" | "payment";
   detail?: string;
+  href?: string;
 };
 
 export type GraphEdge = {
@@ -205,12 +206,13 @@ export async function buildEntityGraph(
       label: center.display_name,
       kind: center.kind,
       detail: `${center.menciones} menciones`,
+      href: `/e/${center.kind}/${center.id}`,
     },
   ];
   const edges: GraphEdge[] = [];
 
   // Conceptos del balance
-  for (const concept of center.conceptos.slice(0, 8)) {
+  for (const concept of center.conceptos.slice(0, 6)) {
     const cid = `concept:${concept}`;
     nodes.push({ id: cid, label: concept, kind: "concept" });
     edges.push({
@@ -227,7 +229,7 @@ export async function buildEntityGraph(
       .from("subsidies")
       .select("id, amount_ars, program_name, amount_verified")
       .eq("company_id", center.id)
-      .limit(12);
+      .limit(8);
 
     for (const p of payments ?? []) {
       const pid = `pay:${p.id}`;
@@ -268,7 +270,7 @@ export async function buildEntityGraph(
           b.shared.length - a.shared.length ||
           b.entity.menciones - a.entity.menciones,
       )
-      .slice(0, 12);
+      .slice(0, 10);
 
     for (const rel of related) {
       const nid = `${rel.entity.kind}:${rel.entity.id}`;
@@ -277,8 +279,8 @@ export async function buildEntityGraph(
         label: rel.entity.display_name,
         kind: rel.entity.kind,
         detail: `comparte: ${rel.shared.slice(0, 2).join(", ")}`,
+        href: `/e/${rel.entity.kind}/${rel.entity.id}`,
       });
-      // vincular vía el primer concepto compartido si existe como nodo
       const sharedConcept = rel.shared[0];
       const conceptNode = `concept:${sharedConcept}`;
       if (nodes.some((n) => n.id === conceptNode)) {
@@ -290,7 +292,7 @@ export async function buildEntityGraph(
         });
       } else {
         edges.push({
-          id: `e-${center.id}-${nid}`,
+          id: `e-center-${nid}`,
           source: `center:${center.id}`,
           target: nid,
           label: "concepto compartido",
