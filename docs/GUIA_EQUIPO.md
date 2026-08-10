@@ -112,8 +112,8 @@ Una PR = un tema. Si tocás base + UI, mejor dos PRs.
 
 ## 9. Links
 
-- Repo GitHub: _(crear y pegar URL)_  
-- Preview / producción Vercel: _(conectar repo — ver `docs/VERCEL_SETUP.md`)_  
+- Repo GitHub: https://github.com/gastonhorianski/Arbol  
+- Preview / producción Vercel: https://arbol-eight.vercel.app  
 - Supabase `arbol-kg-staging`: https://supabase.com/dashboard/project/yevtcxmusooynydsygng  
 - API URL: `https://yevtcxmusooynydsygng.supabase.co`  
 
