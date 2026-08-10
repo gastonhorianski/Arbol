@@ -242,6 +242,36 @@ body {
   background: #e7eef6;
 }
 
+.tag.concept {
+  color: #7a4e12;
+  background: #f6efe3;
+}
+
+.tag.payment {
+  color: #8b1e1e;
+  background: #f8e8e8;
+}
+
+.conn-static {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.7rem;
+  align-items: start;
+  padding: 0.7rem 0.2rem;
+}
+
+.conn-static div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.conn-static em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 0.85rem;
+}
+
 .empty {
   color: var(--muted);
   padding: 0.85rem 1.1rem;

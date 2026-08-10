@@ -16,14 +16,16 @@ const COLORS: Record<GraphNode["kind"], string> = {
   payment: "#8b1e1e",
 };
 
-function shortLabel(text: string, max = 22) {
-  if (text.length <= max) return text;
-  return `${text.slice(0, max - 1)}…`;
-}
+const KIND_LABEL: Record<GraphNode["kind"], string> = {
+  person: "Persona",
+  company: "Empresa",
+  concept: "Concepto",
+  payment: "Monto OCR",
+};
 
 function layout(nodes: GraphNode[]) {
-  const width = 980;
-  const padX = 70;
+  const width = 920;
+  const padX = 80;
   const center = nodes.find((n) => n.id.startsWith("center:"));
   const concepts = nodes.filter((n) => n.kind === "concept");
   const payments = nodes.filter((n) => n.kind === "payment");
@@ -34,14 +36,12 @@ function layout(nodes: GraphNode[]) {
   );
 
   const midRow = [...concepts, ...payments];
-  const rowGap = 150;
-  const y0 = 70;
-  const y1 = y0 + rowGap;
-  const y2 = y1 + rowGap + 20;
-  const height = y2 + 120;
+  const y0 = 56;
+  const y1 = 170;
+  const y2 = 320;
+  const height = 400;
 
   const pos = new Map<string, { x: number; y: number }>();
-
   if (center) pos.set(center.id, { x: width / 2, y: y0 });
 
   midRow.forEach((n, i) => {
@@ -53,33 +53,42 @@ function layout(nodes: GraphNode[]) {
     pos.set(n.id, { x, y: y1 });
   });
 
+  // Related: up to 2 rows so circles don't crowd
+  const perRow = Math.ceil(related.length / 2) || 1;
   related.forEach((n, i) => {
-    const span = Math.max(related.length - 1, 1);
+    const row = i < perRow ? 0 : 1;
+    const idx = row === 0 ? i : i - perRow;
+    const count = row === 0 ? Math.min(related.length, perRow) : related.length - perRow;
+    const span = Math.max(count - 1, 1);
     const x =
-      related.length === 1
-        ? width / 2
-        : padX + ((width - padX * 2) * i) / span;
-    pos.set(n.id, { x, y: y2 });
+      count === 1 ? width / 2 : padX + ((width - padX * 2) * idx) / span;
+    const y = y2 + row * 70;
+    pos.set(n.id, { x, y });
   });
 
-  return { width, height, pos, center, related, midRow };
+  const finalHeight = related.length > perRow ? height + 40 : height;
+  return { width, height: finalHeight, pos, center, related, midRow };
 }
 
 export function EntityGraphView({ nodes, edges }: Props) {
   const router = useRouter();
-  const { width, height, pos, related } = useMemo(() => layout(nodes), [nodes]);
+  const { width, height, pos, related, midRow, center } = useMemo(
+    () => layout(nodes),
+    [nodes],
+  );
 
   function go(node: GraphNode) {
-    if (!node.href) return;
-    if (node.id.startsWith("center:")) return;
+    if (!node.href || node.id.startsWith("center:")) return;
     router.push(node.href);
   }
+
+  const clickable = related;
 
   return (
     <div className="graph-wrap">
       <p className="graph-help">
-        Click en una <strong>persona</strong> o <strong>empresa</strong> del
-        grafo (o de la lista de abajo) para abrir su árbol.
+        El dibujo es el mapa. Los <strong>nombres completos</strong> están en la
+        lista de abajo — ahí también podés hacer click para abrir otra ficha.
       </p>
 
       <div className="graph-scroll">
@@ -110,39 +119,39 @@ export function EntityGraphView({ nodes, edges }: Props) {
             const p = pos.get(n.id);
             if (!p) return null;
             const isCenter = n.id.startsWith("center:");
-            const clickable = Boolean(n.href) && !isCenter;
-            const r = isCenter ? 36 : n.kind === "concept" ? 24 : 28;
+            const canClick = Boolean(n.href) && !isCenter;
+            const r = isCenter ? 38 : n.kind === "concept" ? 26 : 30;
 
             return (
               <g
                 key={n.id}
                 transform={`translate(${p.x}, ${p.y})`}
-                style={{ cursor: clickable ? "pointer" : "default" }}
+                style={{ cursor: canClick ? "pointer" : "default" }}
                 onClick={() => go(n)}
+                tabIndex={canClick ? 0 : undefined}
+                role={canClick ? "link" : undefined}
                 onKeyDown={(ev) => {
-                  if (clickable && (ev.key === "Enter" || ev.key === " ")) {
+                  if (canClick && (ev.key === "Enter" || ev.key === " ")) {
                     ev.preventDefault();
                     go(n);
                   }
                 }}
-                tabIndex={clickable ? 0 : undefined}
-                role={clickable ? "link" : undefined}
               >
                 <title>
-                  {n.label}
+                  {KIND_LABEL[n.kind]}: {n.label}
                   {n.detail ? ` — ${n.detail}` : ""}
-                  {clickable ? " (click para abrir)" : ""}
+                  {canClick ? " (click para abrir)" : ""}
                 </title>
                 <circle
                   r={r}
                   fill={COLORS[n.kind]}
-                  stroke={isCenter ? "#0f3d2c" : "#fff"}
+                  stroke="#fff"
                   strokeWidth={isCenter ? 3 : 2}
                 />
                 <text
-                  y={4}
+                  y={5}
                   textAnchor="middle"
-                  fontSize={isCenter ? 11 : 10}
+                  fontSize={isCenter ? 14 : 12}
                   fontWeight={700}
                   fill="#fff"
                 >
@@ -154,25 +163,6 @@ export function EntityGraphView({ nodes, edges }: Props) {
                         ? "C"
                         : "$"}
                 </text>
-                <text
-                  y={r + 16}
-                  textAnchor="middle"
-                  fontSize={isCenter ? 13 : 11}
-                  fontWeight={isCenter ? 700 : 600}
-                  fill="#15231c"
-                >
-                  {shortLabel(n.label, isCenter ? 34 : 18)}
-                </text>
-                {n.detail ? (
-                  <text
-                    y={r + 30}
-                    textAnchor="middle"
-                    fontSize="10"
-                    fill="#5a6b60"
-                  >
-                    {shortLabel(n.detail, 28)}
-                  </text>
-                ) : null}
               </g>
             );
           })}
@@ -180,34 +170,56 @@ export function EntityGraphView({ nodes, edges }: Props) {
       </div>
 
       <div className="graph-legend">
-        <span>
-          <i className="dot company" /> Empresa
-        </span>
-        <span>
-          <i className="dot person" /> Persona
-        </span>
-        <span>
-          <i className="dot concept" /> Concepto
-        </span>
-        <span>
-          <i className="dot payment" /> Monto (OCR)
-        </span>
+        <span><i className="dot company" /> Empresa</span>
+        <span><i className="dot person" /> Persona</span>
+        <span><i className="dot concept" /> Concepto</span>
+        <span><i className="dot payment" /> Monto (OCR)</span>
       </div>
 
-      {related.length > 0 && (
+      {center && (
         <div className="conn-list">
-          <h3>Conexiones clickeables</h3>
+          <h3>Ficha central</h3>
+          <div className="conn-static">
+            <span className={`tag ${center.kind}`}>
+              {KIND_LABEL[center.kind]}
+            </span>
+            <div>
+              <strong>{center.label}</strong>
+              {center.detail ? <em>{center.detail}</em> : null}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {midRow.length > 0 && (
+        <div className="conn-list">
+          <h3>Conceptos / montos</h3>
           <ul>
-            {related.map((n) => (
+            {midRow.map((n) => (
               <li key={n.id}>
-                <button
-                  type="button"
-                  className="conn-btn"
-                  onClick={() => go(n)}
-                >
-                  <span className={`tag ${n.kind}`}>
-                    {n.kind === "company" ? "Empresa" : "Persona"}
+                <div className="conn-static">
+                  <span className={`tag ${n.kind === "payment" ? "payment" : "concept"}`}>
+                    {KIND_LABEL[n.kind]}
                   </span>
+                  <div>
+                    <strong>{n.label}</strong>
+                    {n.detail ? <em>{n.detail}</em> : null}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {clickable.length > 0 && (
+        <div className="conn-list">
+          <h3>Conexiones (click para abrir su árbol)</h3>
+          <ul>
+            {clickable.map((n) => (
+              <li key={n.id}>
+                <button type="button" className="conn-btn" onClick={() => go(n)}>
+                  <span className={`tag ${n.kind}`}>{KIND_LABEL[n.kind]}</span>
                   <strong>{n.label}</strong>
                   <em>{n.detail}</em>
                 </button>
