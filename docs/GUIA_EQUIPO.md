@@ -20,9 +20,11 @@ No es solo una planilla. Es un **mapa de relaciones** para investigar y explicar
 
 ---
 
-## Primera fuente de datos (para empezar)
+## Primera fuente cargada (avance)
 
-**Título:** Balance 2025 de Municipalidad de Posadas
+**Título de la fuente:** Balance 2025 de Municipalidad de Posadas
+
+Esto **no es todo el proyecto**. Es solo la primera tanda de datos para armar y probar el mapa. Después se suman otras fuentes (por ejemplo **IMAC**).
 
 Ya tenemos un trabajo previo con fotos del balance municipal 2025 (sacadas con celular) y texto leído por OCR.
 
@@ -34,7 +36,7 @@ Ya tenemos un trabajo previo con fotos del balance municipal 2025 (sacadas con c
 - Los **montos** (plata). La lectura automática desde fotos de celular tiene errores.  
   Regla: si un monto importa para publicar o afirmar algo, **se contrasta con la foto original**.
 
-En resumen: esta fuente nos sirve mucho para armar la red de quién aparece; los importes van con bandera de “revisar contra foto”.
+En resumen: esta fuente sirve para armar la red de quién aparece; los importes van con bandera de “revisar contra foto”.
 
 ---
 

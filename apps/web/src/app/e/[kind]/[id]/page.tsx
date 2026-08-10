@@ -27,12 +27,13 @@ export default async function EntityPage({ params }: Props) {
         </Link>
       </p>
       <header className="hero">
-        <p className="eyebrow">Árbol de relaciones · Balance 2025 Posadas</p>
+        <p className="eyebrow">Árbol · ficha de relaciones</p>
         <h1>{center.display_name}</h1>
         <p className="lead">
           {center.kind === "company" ? "Proveedor / empresa" : "Persona"} ·{" "}
-          {center.menciones} menciones en el balance. Los montos, si aparecen,
-          vienen de OCR y <strong>no están verificados</strong> contra las fotos.
+          {center.menciones} menciones en la fuente actual (Balance 2025
+          Posadas). Los montos, si aparecen, son OCR y{" "}
+          <strong>no están verificados</strong>.
         </p>
       </header>
 
@@ -67,10 +68,10 @@ export default async function EntityPage({ params }: Props) {
       )}
 
       <footer className="foot">
-        Fuente: Balance 2025 de Municipalidad de Posadas. Regla de vínculos:
-        pagos propios, conceptos propios, posibles alias del mismo nombre, y
-        solo coincidencias de rubros poco frecuentes. No se conecta gente solo
-        por «publicidad institucional» genérica.
+        Fuente de esta ficha: Balance 2025 de Municipalidad de Posadas (primera
+        carga). Más adelante se cruzan otras fuentes (IMAC, etc.). Vínculos
+        actuales: pagos propios, conceptos propios, posibles alias y solo
+        rubros poco frecuentes compartidos.
       </footer>
     </main>
   );

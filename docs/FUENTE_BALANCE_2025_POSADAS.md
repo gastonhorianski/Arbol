@@ -1,5 +1,9 @@
 # Fuente: Balance 2025 de Municipalidad de Posadas
 
+## Rol en el proyecto Árbol
+
+Es la **primera fuente cargada**, no el alcance total del mapa. Sirve para probar ingesta, buscador y árboles. Después se suman otras fuentes (p. ej. **IMAC**).
+
 ## Qué es
 
 Material del balance municipal 2025 de Posadas: fotos tomadas con celular + lectura OCR + listas de beneficiarios/proveedores ya procesadas.

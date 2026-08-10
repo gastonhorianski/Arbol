@@ -21,12 +21,13 @@ export default async function Home({ searchParams }: Props) {
   return (
     <main className="page">
       <header className="hero">
-        <p className="eyebrow">Árbol · mapa en construcción</p>
-        <h1>Balance 2025 de Municipalidad de Posadas</h1>
+        <p className="eyebrow">Árbol · mapa de relaciones</p>
+        <h1>Árbol</h1>
         <p className="lead">
-          Buscá una persona o empresa y abrí su <strong>árbol de relaciones</strong>
-          : conceptos del balance, otros actores cercanos y montos OCR (sin
-          verificar).
+          Mapa en construcción de personas, empresas y plata pública.{" "}
+          <strong>Hoy</strong> está cargada la primera fuente (Balance 2025 de
+          Municipalidad de Posadas). <strong>Después</strong> se suman otras,
+          como IMAC.
         </p>
       </header>
 
@@ -54,8 +55,9 @@ export default async function Home({ searchParams }: Props) {
       )}
 
       <div className="banner warn">
-        <strong>Importante:</strong> nombres de proveedores y personas sirven.
-        Los importes hay que contrastarlos con las fotos. Probá buscar{" "}
+        <strong>Fuente actual:</strong> Balance 2025 de Municipalidad de Posadas
+        (datos de prueba / avance). Los nombres sirven; los montos hay que
+        chequearlos con fotos. Probá{" "}
         <Link href="/?q=huls">huls</Link> o{" "}
         <Link href="/?q=luis%20huls">luis huls</Link>.
       </div>
@@ -80,7 +82,11 @@ export default async function Home({ searchParams }: Props) {
 
       <section className="list">
         <div className="list-head">
-          <h2>{q ? `Resultados para “${q}”` : "Más mencionados — clic para ver el árbol"}</h2>
+          <h2>
+            {q
+              ? `Resultados para “${q}”`
+              : "Más mencionados en la fuente actual — clic para ver el árbol"}
+          </h2>
           <p>{entities.length} filas</p>
         </div>
         <ul>
@@ -109,7 +115,8 @@ export default async function Home({ searchParams }: Props) {
       </section>
 
       <footer className="foot">
-        Fuente: {stats.source}. Clic en un resultado para abrir el árbol.
+        Fuente mostrada ahora: {stats.source}. El proyecto Árbol va a integrar
+        más fuentes (p. ej. IMAC). Clic en un resultado para abrir el árbol.
       </footer>
     </main>
   );
