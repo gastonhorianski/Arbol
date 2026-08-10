@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Árbol — Guía de trabajo del equipo</title>
+  <style>
+    @page { margin: 1.6cm; size: A4; }
+    :root {
+      --ink: #1a1f1c;
+      --muted: #4a554e;
+      --line: #d5ddd7;
+      --accent: #1f5c45;
+      --bg: #f7f6f2;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background: white;
+      line-height: 1.45;
+      font-size: 11pt;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 22pt;
+      margin: 0 0 4px;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+    }
+    .subtitle { color: var(--muted); margin-bottom: 20px; }
+    h2 {
+      font-size: 13pt;
+      margin: 22px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--line);
+      color: var(--accent);
+    }
+    p, li { margin: 6px 0; }
+    ul { padding-left: 1.2em; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px;
+      font-size: 10.5pt;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 7px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--bg); }
+    blockquote {
+      margin: 12px 0;
+      padding: 10px 14px;
+      background: var(--bg);
+      border-left: 4px solid var(--accent);
+      color: var(--ink);
+    }
+    code, pre {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 10pt;
+    }
+    pre {
+      background: var(--bg);
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      white-space: pre-wrap;
+    }
+    .box {
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      margin: 12px 0;
+      background: #fff;
+    }
+    .footer {
+      margin-top: 28px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 9.5pt;
+    }
+    @media print {
+      body { padding: 0; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Árbol</h1>
+  <p class="subtitle"><strong>Guía de trabajo del equipo</strong> — Documento Día 0. Léelo una vez. Después, solo “hacer y subir”.</p>
+
+  <h2>1. Qué estamos construyendo</h2>
+  <p>Un <strong>mapa de relaciones</strong> (knowledge graph) entre:</p>
+  <ul>
+    <li>Políticos y funcionarios</li>
+    <li>Familiares</li>
+    <li>Empresas (propiedad / directorio / participación)</li>
+    <li>Subsidios del Estado a esas empresas</li>
+  </ul>
+  <p>Objetivo: ver <strong>cómo fluye el dinero público</strong> a través de vínculos familiares y corporativos.</p>
+
+  <h2>2. Regla de oro</h2>
+  <blockquote>La IA es personal. El proyecto es compartido.</blockquote>
+  <p>Podés usar <strong>Claude, Cursor, ChatGPT o lo que sea</strong>. No hace falta la misma herramienta.</p>
+  <table>
+    <thead><tr><th>Pieza</th><th>Para qué sirve</th></tr></thead>
+    <tbody>
+      <tr><td><strong>GitHub</strong></td><td>El código de todos</td></tr>
+      <tr><td><strong>Vercel</strong></td><td>Link automático para ver el avance (sin instalar nada)</td></tr>
+      <tr><td><strong>Supabase</strong></td><td>La base de datos central (proyecto <strong>nuevo</strong>, no el de VASTO)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Cómo trabajamos</h2>
+  <ol>
+    <li>Trabajás en <strong>tu parte</strong> (sección 5).</li>
+    <li>Pedile a tu IA código <strong>solo en tu carpeta</strong>.</li>
+    <li>Subís a GitHub en una <strong>rama</strong> (no directo a <code>main</code>).</li>
+    <li>Abrís un <strong>Pull Request</strong>.</li>
+    <li>Vercel genera un <strong>link preview</strong> → ese link se lo mandás al resto.</li>
+    <li>Si está bien, se mezcla a <code>main</code>.</li>
+  </ol>
+  <p><strong>Sin reuniones.</strong> El preview es la reunión.</p>
+
+  <h2>4. Identidad de datos (contrato de oro)</h2>
+  <ul>
+    <li>Personas → anclar con <strong>DNI</strong> (si existe).</li>
+    <li>Empresas → anclar con <strong>CUIT</strong> (si existe).</li>
+    <li>El nombre es solo etiqueta (puede haber alias).</li>
+    <li>Clave interna = <strong>UUID</strong>; DNI/CUIT únicos cuando existen.</li>
+    <li><strong>Nunca inventar</strong> DNI/CUIT. Si no está, dejar vacío y marcar la fuente.</li>
+  </ul>
+
+  <h2>5. Quién toca qué</h2>
+  <table>
+    <thead><tr><th>Rol</th><th>Dueño de</th><th>No tocar sin avisar</th></tr></thead>
+    <tbody>
+      <tr><td>Persona A</td><td>UI del mapa / fichas (<code>apps/web</code>)</td><td>Migraciones de base</td></tr>
+      <tr><td>Persona B</td><td>Schema / migraciones (<code>packages/db</code>)</td><td>Componentes visuales del grafo</td></tr>
+      <tr><td>Persona C</td><td>Carga de datos / ETL (<code>scripts/ingest</code>)</td><td>UI</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Carpetas sagradas</strong> (hablar antes): <code>packages/domain</code> y <code>packages/db/migrations</code>.</p>
+
+  <h2>6. Nombres de ramas</h2>
+  <pre>feat/&lt;inicial&gt;/&lt;tema&gt;
+
+Ejemplos:
+feat/o/graph-ui
+feat/p/ingest-subsidios
+feat/m/schema-persons</pre>
+  <p>Una PR = un tema.</p>
+
+  <h2>7. Qué NO hacemos (por ahora)</h2>
+  <ul>
+    <li>No mezclar datos con el Supabase de <strong>VASTO / panadería</strong>.</li>
+    <li>No crear tablas solo en el panel: van por <strong>migración en el repo</strong>.</li>
+    <li>No Neo4j en Fase 1 (Postgres alcanza).</li>
+    <li>No pelear por Claude vs Cursor.</li>
+  </ul>
+
+  <h2>8. Analogía rápida</h2>
+  <table>
+    <thead><tr><th>En la vida real</th><th>En el proyecto</th></tr></thead>
+    <tbody>
+      <tr><td>Tu Word / Google Docs</td><td>Tu IA (Claude, Cursor…)</td></tr>
+      <tr><td>Carpeta compartida del Drive</td><td>GitHub</td></tr>
+      <tr><td>Link público del documento</td><td>Vercel preview</td></tr>
+      <tr><td>Planilla central</td><td>Supabase (proyecto Árbol)</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9. Links del proyecto</h2>
+  <div class="box">
+    <p>Repo GitHub: <em>(crear y pegar URL)</em></p>
+    <p>Vercel: <em>(conectar repo → docs/VERCEL_SETUP.md)</em></p>
+    <p>Supabase <code>arbol-kg-staging</code>: <a href="https://supabase.com/dashboard/project/yevtcxmusooynydsygng">https://supabase.com/dashboard/project/yevtcxmusooynydsygng</a></p>
+    <p>API URL: <code>https://yevtcxmusooynydsygng.supabase.co</code></p>
+  </div>
+
+  <h2>10. Mensaje corto (WhatsApp / mail)</h2>
+  <div class="box">
+    Cada uno usa la IA que quiera (yo Cursor, ustedes Claude si prefieren).<br/>
+    Código → GitHub. Ver avance → link de Vercel. Datos → Supabase nuevo (no VASTO).<br/>
+    Personas por DNI, empresas por CUIT. Cada uno en su carpeta. Sin reuniones.
+  </div>
+
+  <p class="footer">Versión Día 0 — Árbol Knowledge Graph · Imprimir / Guardar como PDF desde el navegador (Ctrl+P)</p>
+</body>
+</html>

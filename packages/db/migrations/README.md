@@ -1,0 +1,1 @@
+-- Initial knowledge graph schema (mirror for packages/db)

@@ -1,0 +1,6 @@
+# CODEOWNERS — ajustar GitHub usernames cuando existan
+# Las carpetas sagradas requieren revisión de quien custodia el contrato de datos.
+
+/packages/domain/ @orlan
+/packages/db/ @orlan
+/supabase/migrations/ @orlan
