@@ -67,9 +67,10 @@ export default async function EntityPage({ params }: Props) {
       )}
 
       <footer className="foot">
-        Fuente: Balance 2025 de Municipalidad de Posadas. Esto es un avance del
-        mapa Árbol: acá se ven cercanías por conceptos y pagos OCR, no todavía
-        vínculos familiares o societarios completos.
+        Fuente: Balance 2025 de Municipalidad de Posadas. Regla de vínculos:
+        pagos propios, conceptos propios, posibles alias del mismo nombre, y
+        solo coincidencias de rubros poco frecuentes. No se conecta gente solo
+        por «publicidad institucional» genérica.
       </footer>
     </main>
   );

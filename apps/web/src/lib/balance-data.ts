@@ -48,7 +48,49 @@ function parseConceptos(notes: string | null): string[] {
   return m[1]
     .split("|")
     .map((c) => c.trim())
-    .filter((c) => c.length > 1);
+    .filter((c) => isMeaningfulConcept(c));
+}
+
+/** Descarta rubros demasiado genéricos o ruidosos del OCR. */
+function isMeaningfulConcept(concept: string): boolean {
+  const c = concept.trim();
+  if (c.length < 14) return false;
+  const u = c.toLocaleUpperCase("es");
+
+  // Publicidad / pub institucional genérica: solo si es muy específica
+  if (u.includes("PUBLICIDAD") || u.includes("PUB.INSTITUCIONAL") || u.startsWith("PUB.")) {
+    return u.length >= 30;
+  }
+
+  // Otros rubros masivos/cortos
+  if (
+    /^(SERV\.?|ALQ\.?|ADICIONAL|REPARACION|HABERES|MATERIALES)\b/.test(u) &&
+    u.length < 24
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function nameSignature(name: string): string {
+  return name
+    .toLocaleUpperCase("es")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1)
+    .slice(0, 2)
+    .join(" ");
+}
+
+function likelySameOrAlias(a: string, b: string): boolean {
+  const sa = nameSignature(a);
+  const sb = nameSignature(b);
+  if (!sa || !sb || sa !== sb) return false;
+  // evitar juntar nombres cortos demasiado comunes
+  return sa.split(" ").join("").length >= 8;
 }
 
 function tokensFromQuery(q: string): string[] {
@@ -202,6 +244,17 @@ export async function buildEntityGraph(
   const center = await getEntity(kind, id);
   if (!center) return null;
 
+  const all = await fetchSourceEntities(1000);
+
+  const conceptFreq = new Map<string, number>();
+  for (const e of all) {
+    for (const c of e.conceptos) {
+      conceptFreq.set(c, (conceptFreq.get(c) ?? 0) + 1);
+    }
+  }
+
+  const ownConcepts = center.conceptos.slice(0, 6);
+
   const nodes: GraphNode[] = [
     {
       id: `center:${center.id}`,
@@ -209,31 +262,30 @@ export async function buildEntityGraph(
       kind: center.kind,
       detail: `${center.menciones} menciones en el balance`,
       reason:
-        "Esta es la ficha que abriste. El resto del árbol se arma desde lo que aparece junto a este nombre en el Balance 2025 de Municipalidad de Posadas.",
+        "Ficha central. Solo mostramos vínculos con evidencia concreta: pagos propios, conceptos propios, posibles alias del mismo nombre, o rubros poco frecuentes compartidos.",
       href: `/e/${center.kind}/${center.id}`,
     },
   ];
   const edges: GraphEdge[] = [];
 
-  // Conceptos del balance
-  for (const concept of center.conceptos.slice(0, 6)) {
+  for (const concept of ownConcepts) {
     const cid = `concept:${concept}`;
+    const freq = conceptFreq.get(concept) ?? 1;
     nodes.push({
       id: cid,
       label: concept,
       kind: "concept",
-      detail: "Rubro / concepto del balance",
-      reason: `Aparece vinculado a ${center.display_name} en el Balance 2025 de Municipalidad de Posadas (texto leído por OCR de las fotos).`,
+      detail: "Concepto propio en el balance",
+      reason: `Este rubro aparece en los registros de ${center.display_name} en el Balance 2025 de Municipalidad de Posadas${freq <= 3 ? " (poco frecuente: más específico)" : ""}.`,
     });
     edges.push({
       id: `e-${center.id}-${cid}`,
       source: `center:${center.id}`,
       target: cid,
-      label: "concepto",
+      label: "concepto propio",
     });
   }
 
-  // Montos (solo empresas) — sin verificar
   if (center.kind === "company") {
     const { data: payments } = await supabase
       .from("subsidies")
@@ -255,67 +307,101 @@ export async function buildEntityGraph(
         kind: "payment",
         detail: p.amount_verified ? "Monto verificado" : "Monto OCR sin verificar",
         reason: p.amount_verified
-          ? `Pago asociado a ${center.display_name} por «${program}».`
-          : `Pago asociado a ${center.display_name} por «${program}». El importe salió de OCR sobre fotos de celular: hay que contrastarlo con la foto original.`,
+          ? `Pago a nombre de ${center.display_name} por «${program}».`
+          : `Pago a nombre de ${center.display_name} por «${program}». Importe OCR: verificar contra la foto.`,
       });
       edges.push({
         id: `e-${center.id}-${pid}`,
         source: `center:${center.id}`,
         target: pid,
-        label: program,
+        label: "pago propio",
       });
     }
   }
 
-  // Otros actores que comparten conceptos (árbol de cercanía)
-  if (center.conceptos.length) {
-    const all = await fetchSourceEntities(1000);
-    const related = all
-      .filter((e) => e.id !== center.id)
-      .map((e) => ({
-        entity: e,
-        shared: e.conceptos.filter((c) => center.conceptos.includes(c)),
-      }))
-      .filter((x) => x.shared.length > 0)
-      .sort(
-        (a, b) =>
-          b.shared.length - a.shared.length ||
-          b.entity.menciones - a.entity.menciones,
-      )
-      .slice(0, 10);
+  const aliases = all
+    .filter((e) => e.id !== center.id && e.kind === center.kind)
+    .filter((e) => likelySameOrAlias(center.display_name, e.display_name))
+    .sort((a, b) => b.menciones - a.menciones)
+    .slice(0, 5);
 
-    for (const rel of related) {
-      const nid = `${rel.entity.kind}:${rel.entity.id}`;
-      const sharedList = rel.shared.slice(0, 3).map((c) => `«${c}»`).join(", ");
-      const who =
-        rel.entity.kind === "company" ? "la empresa" : "la persona";
-      nodes.push({
-        id: nid,
-        label: rel.entity.display_name,
-        kind: rel.entity.kind,
-        detail: `${rel.entity.menciones} menciones`,
-        reason: `Está conectado/a con ${center.display_name} porque ${who} también aparece en el Balance 2025 de Municipalidad de Posadas bajo el mismo concepto: ${sharedList}. No implica (todavía) vínculo familiar ni societario: solo coincidencia de rubro en esa fuente.`,
-        href: `/e/${rel.entity.kind}/${rel.entity.id}`,
+  for (const alias of aliases) {
+    const nid = `${alias.kind}:${alias.id}`;
+    nodes.push({
+      id: nid,
+      label: alias.display_name,
+      kind: alias.kind,
+      detail: `${alias.menciones} menciones · posible alias`,
+      reason: `Se conecta con ${center.display_name} porque el nombre es casi igual (núcleo «${nameSignature(center.display_name)}»). En OCR el mismo actor a veces aparece con variantes. Es posible misma persona/empresa, no un vínculo social nuevo.`,
+      href: `/e/${alias.kind}/${alias.id}`,
+    });
+    edges.push({
+      id: `e-alias-${alias.id}`,
+      source: `center:${center.id}`,
+      target: nid,
+      label: "posible alias",
+    });
+  }
+
+  const rareShared = all
+    .filter((e) => e.id !== center.id)
+    .filter((e) => !aliases.some((a) => a.id === e.id))
+    .map((e) => {
+      const sharedRare = e.conceptos.filter((c) => {
+        if (!center.conceptos.includes(c)) return false;
+        return (conceptFreq.get(c) ?? 99) <= 3;
       });
-      const sharedConcept = rel.shared[0];
-      const conceptNode = `concept:${sharedConcept}`;
-      if (nodes.some((n) => n.id === conceptNode)) {
-        edges.push({
-          id: `e-${conceptNode}-${nid}`,
-          source: conceptNode,
-          target: nid,
-          label: "mismo concepto",
-        });
-      } else {
-        edges.push({
-          id: `e-center-${nid}`,
-          source: `center:${center.id}`,
-          target: nid,
-          label: "concepto compartido",
-        });
-      }
+      return { entity: e, sharedRare };
+    })
+    .filter((x) => x.sharedRare.length > 0)
+    .sort(
+      (a, b) =>
+        b.sharedRare.length - a.sharedRare.length ||
+        b.entity.menciones - a.entity.menciones,
+    )
+    .slice(0, 6);
+
+  for (const rel of rareShared) {
+    const nid = `${rel.entity.kind}:${rel.entity.id}`;
+    const sharedList = rel.sharedRare
+      .slice(0, 2)
+      .map((c) => `«${c}»`)
+      .join(", ");
+    nodes.push({
+      id: nid,
+      label: rel.entity.display_name,
+      kind: rel.entity.kind,
+      detail: `${rel.entity.menciones} menciones · rubro raro compartido`,
+      reason: `Se conecta con ${center.display_name} porque ambos aparecen bajo el mismo rubro poco frecuente ${sharedList}. Eso es más informativo que compartir «publicidad institucional» genérica. No prueba parentesco ni sociedad.`,
+      href: `/e/${rel.entity.kind}/${rel.entity.id}`,
+    });
+
+    const bridge = rel.sharedRare[0];
+    const conceptNode = `concept:${bridge}`;
+    if (!nodes.some((n) => n.id === conceptNode)) {
+      nodes.push({
+        id: conceptNode,
+        label: bridge,
+        kind: "concept",
+        detail: "Rubro poco frecuente",
+        reason:
+          "Rubro específico del Balance 2025 compartido por pocos actores (≤3).",
+      });
+      edges.push({
+        id: `e-${center.id}-${conceptNode}`,
+        source: `center:${center.id}`,
+        target: conceptNode,
+        label: "concepto propio",
+      });
     }
+    edges.push({
+      id: `e-${conceptNode}-${nid}`,
+      source: conceptNode,
+      target: nid,
+      label: "mismo rubro raro",
+    });
   }
 
   return { center, nodes, edges };
 }
+
