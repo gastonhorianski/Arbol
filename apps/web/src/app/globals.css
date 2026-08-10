@@ -354,12 +354,90 @@ body {
 .conn-list {
   border-top: 1px solid var(--line);
   margin-top: 0.6rem;
-  padding: 0.8rem 1rem 0.4rem;
+  padding: 0.8rem 1rem 0.8rem;
 }
 
 .conn-list h3 {
-  margin: 0 0 0.55rem;
-  font-size: 0.95rem;
+  margin: 0 0 0.7rem;
+  font-size: 1rem;
+}
+
+.card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.node-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.75rem;
+  align-items: start;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fbfcfb;
+  padding: 0.85rem 0.95rem;
+  font: inherit;
+  color: inherit;
+}
+
+.node-card.clickable {
+  cursor: pointer;
+}
+
+.node-card.clickable:hover {
+  background: #eef5f0;
+  border-color: #c5d6cb;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.card-name {
+  font-size: 1.02rem;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.card-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.card-reason {
+  margin: 0.35rem 0 0;
+  padding: 0.55rem 0.65rem;
+  background: #f3f7f4;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.card-reason span {
+  display: block;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-cta {
+  grid-column: 2;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin-top: 0.2rem;
 }
 
 .conn-list ul {

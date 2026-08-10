@@ -17,6 +17,8 @@ export type GraphNode = {
   label: string;
   kind: "person" | "company" | "concept" | "payment";
   detail?: string;
+  /** Explicación legible de por qué aparece en este árbol */
+  reason?: string;
   href?: string;
 };
 
@@ -205,7 +207,9 @@ export async function buildEntityGraph(
       id: `center:${center.id}`,
       label: center.display_name,
       kind: center.kind,
-      detail: `${center.menciones} menciones`,
+      detail: `${center.menciones} menciones en el balance`,
+      reason:
+        "Esta es la ficha que abriste. El resto del árbol se arma desde lo que aparece junto a este nombre en el Balance 2025 de Municipalidad de Posadas.",
       href: `/e/${center.kind}/${center.id}`,
     },
   ];
@@ -214,7 +218,13 @@ export async function buildEntityGraph(
   // Conceptos del balance
   for (const concept of center.conceptos.slice(0, 6)) {
     const cid = `concept:${concept}`;
-    nodes.push({ id: cid, label: concept, kind: "concept" });
+    nodes.push({
+      id: cid,
+      label: concept,
+      kind: "concept",
+      detail: "Rubro / concepto del balance",
+      reason: `Aparece vinculado a ${center.display_name} en el Balance 2025 de Municipalidad de Posadas (texto leído por OCR de las fotos).`,
+    });
     edges.push({
       id: `e-${center.id}-${cid}`,
       source: `center:${center.id}`,
@@ -238,19 +248,21 @@ export async function buildEntityGraph(
         currency: "ARS",
         maximumFractionDigits: 0,
       });
+      const program = p.program_name || "concepto no legible";
       nodes.push({
         id: pid,
         label: amount,
         kind: "payment",
-        detail: p.amount_verified
-          ? "verificado"
-          : "sin verificar (OCR)",
+        detail: p.amount_verified ? "Monto verificado" : "Monto OCR sin verificar",
+        reason: p.amount_verified
+          ? `Pago asociado a ${center.display_name} por «${program}».`
+          : `Pago asociado a ${center.display_name} por «${program}». El importe salió de OCR sobre fotos de celular: hay que contrastarlo con la foto original.`,
       });
       edges.push({
         id: `e-${center.id}-${pid}`,
         source: `center:${center.id}`,
         target: pid,
-        label: p.program_name || "pago",
+        label: program,
       });
     }
   }
@@ -274,11 +286,15 @@ export async function buildEntityGraph(
 
     for (const rel of related) {
       const nid = `${rel.entity.kind}:${rel.entity.id}`;
+      const sharedList = rel.shared.slice(0, 3).map((c) => `«${c}»`).join(", ");
+      const who =
+        rel.entity.kind === "company" ? "la empresa" : "la persona";
       nodes.push({
         id: nid,
         label: rel.entity.display_name,
         kind: rel.entity.kind,
-        detail: `comparte: ${rel.shared.slice(0, 2).join(", ")}`,
+        detail: `${rel.entity.menciones} menciones`,
+        reason: `Está conectado/a con ${center.display_name} porque ${who} también aparece en el Balance 2025 de Municipalidad de Posadas bajo el mismo concepto: ${sharedList}. No implica (todavía) vínculo familiar ni societario: solo coincidencia de rubro en esa fuente.`,
         href: `/e/${rel.entity.kind}/${rel.entity.id}`,
       });
       const sharedConcept = rel.shared[0];
@@ -288,7 +304,7 @@ export async function buildEntityGraph(
           id: `e-${conceptNode}-${nid}`,
           source: conceptNode,
           target: nid,
-          label: "también aparece",
+          label: "mismo concepto",
         });
       } else {
         edges.push({

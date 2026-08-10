@@ -53,12 +53,12 @@ function layout(nodes: GraphNode[]) {
     pos.set(n.id, { x, y: y1 });
   });
 
-  // Related: up to 2 rows so circles don't crowd
   const perRow = Math.ceil(related.length / 2) || 1;
   related.forEach((n, i) => {
     const row = i < perRow ? 0 : 1;
     const idx = row === 0 ? i : i - perRow;
-    const count = row === 0 ? Math.min(related.length, perRow) : related.length - perRow;
+    const count =
+      row === 0 ? Math.min(related.length, perRow) : related.length - perRow;
     const span = Math.max(count - 1, 1);
     const x =
       count === 1 ? width / 2 : padX + ((width - padX * 2) * idx) / span;
@@ -68,6 +68,41 @@ function layout(nodes: GraphNode[]) {
 
   const finalHeight = related.length > perRow ? height + 40 : height;
   return { width, height: finalHeight, pos, center, related, midRow };
+}
+
+function NodeCard({
+  node,
+  onOpen,
+}: {
+  node: GraphNode;
+  onOpen?: (node: GraphNode) => void;
+}) {
+  const clickable = Boolean(node.href) && !node.id.startsWith("center:") && onOpen;
+  const body = (
+    <>
+      <span className={`tag ${node.kind}`}>{KIND_LABEL[node.kind]}</span>
+      <div className="card-body">
+        <strong className="card-name">{node.label}</strong>
+        {node.detail ? <p className="card-meta">{node.detail}</p> : null}
+        {node.reason ? (
+          <p className="card-reason">
+            <span>Por qué está conectado:</span> {node.reason}
+          </p>
+        ) : null}
+      </div>
+    </>
+  );
+
+  if (clickable) {
+    return (
+      <button type="button" className="node-card clickable" onClick={() => onOpen?.(node)}>
+        {body}
+        <span className="card-cta">Abrir su árbol →</span>
+      </button>
+    );
+  }
+
+  return <div className="node-card">{body}</div>;
 }
 
 export function EntityGraphView({ nodes, edges }: Props) {
@@ -82,13 +117,11 @@ export function EntityGraphView({ nodes, edges }: Props) {
     router.push(node.href);
   }
 
-  const clickable = related;
-
   return (
     <div className="graph-wrap">
       <p className="graph-help">
-        El dibujo es el mapa. Los <strong>nombres completos</strong> están en la
-        lista de abajo — ahí también podés hacer click para abrir otra ficha.
+        Arriba: mapa visual. Abajo: <strong>nombres completos</strong> y la
+        explicación de <strong>por qué</strong> aparece cada conexión.
       </p>
 
       <div className="graph-scroll">
@@ -138,9 +171,8 @@ export function EntityGraphView({ nodes, edges }: Props) {
                 }}
               >
                 <title>
-                  {KIND_LABEL[n.kind]}: {n.label}
-                  {n.detail ? ` — ${n.detail}` : ""}
-                  {canClick ? " (click para abrir)" : ""}
+                  {n.label}
+                  {canClick ? " — click para abrir" : ""}
                 </title>
                 <circle
                   r={r}
@@ -179,53 +211,29 @@ export function EntityGraphView({ nodes, edges }: Props) {
       {center && (
         <div className="conn-list">
           <h3>Ficha central</h3>
-          <div className="conn-static">
-            <span className={`tag ${center.kind}`}>
-              {KIND_LABEL[center.kind]}
-            </span>
-            <div>
-              <strong>{center.label}</strong>
-              {center.detail ? <em>{center.detail}</em> : null}
-            </div>
-          </div>
+          <NodeCard node={center} />
         </div>
       )}
 
       {midRow.length > 0 && (
         <div className="conn-list">
-          <h3>Conceptos / montos</h3>
-          <ul>
+          <h3>Conceptos y montos vinculados</h3>
+          <div className="card-stack">
             {midRow.map((n) => (
-              <li key={n.id}>
-                <div className="conn-static">
-                  <span className={`tag ${n.kind === "payment" ? "payment" : "concept"}`}>
-                    {KIND_LABEL[n.kind]}
-                  </span>
-                  <div>
-                    <strong>{n.label}</strong>
-                    {n.detail ? <em>{n.detail}</em> : null}
-                  </div>
-                </div>
-              </li>
+              <NodeCard key={n.id} node={n} />
             ))}
-          </ul>
+          </div>
         </div>
       )}
 
-      {clickable.length > 0 && (
+      {related.length > 0 && (
         <div className="conn-list">
-          <h3>Conexiones (click para abrir su árbol)</h3>
-          <ul>
-            {clickable.map((n) => (
-              <li key={n.id}>
-                <button type="button" className="conn-btn" onClick={() => go(n)}>
-                  <span className={`tag ${n.kind}`}>{KIND_LABEL[n.kind]}</span>
-                  <strong>{n.label}</strong>
-                  <em>{n.detail}</em>
-                </button>
-              </li>
+          <h3>Personas / empresas conectadas</h3>
+          <div className="card-stack">
+            {related.map((n) => (
+              <NodeCard key={n.id} node={n} onOpen={go} />
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
